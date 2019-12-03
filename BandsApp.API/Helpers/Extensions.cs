@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Http;
 
 namespace BandsApp.API.Helpers
@@ -9,6 +10,16 @@ namespace BandsApp.API.Helpers
             response.Headers.Add("Application-Error", message);
             response.Headers.Add("Access-Control-Expose-Headers", "Application-Error");
             response.Headers.Add("Access-Control-Allow-Origin", "*");
+        }
+
+        public static int CalculateAge(this DateTime theDateTime)
+        {
+            var age = DateTime.Today.Year - theDateTime.Year;
+            
+            //Check if your current year birthday is greater than current day
+            if (theDateTime.AddYears(age) > DateTime.Today)
+                age--;
+            return age;
         }
     }
 }
