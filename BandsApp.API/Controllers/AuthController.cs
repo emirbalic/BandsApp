@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using BandsApp.API.Data;
 using BandsApp.API.Dtos;
 using BandsApp.API.Models;
@@ -18,10 +19,12 @@ namespace BandsApp.API.Controllers
     {
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        private readonly IMapper _mapper;
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
-            this._config = config;
-            this._repo = repo;
+            _mapper = mapper;
+            _config = config;
+            _repo = repo;
 
         }
 
@@ -77,8 +80,12 @@ namespace BandsApp.API.Controllers
 
             var token = tokenHandlar.CreateToken(tokenDescriptor);
 
-            return Ok(new {
-                token = tokenHandlar.WriteToken(token)
+            var user = _mapper.Map<UserForListDto>(userFromRepo);
+
+            return Ok(new
+            {
+                token = tokenHandlar.WriteToken(token),
+                user
             });
         }
     }
