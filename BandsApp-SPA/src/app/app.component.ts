@@ -10,7 +10,7 @@ import { User } from './_models/user';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit{
-  title = 'Balkan Bands';
+  title = 'Find Your Band';
 
   jwtHelper = new JwtHelperService();
 
