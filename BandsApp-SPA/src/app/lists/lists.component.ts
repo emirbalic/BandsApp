@@ -34,12 +34,12 @@ export class ListsComponent implements OnInit {
     this.userService.getUsers(this.pagination.currentPage, this.pagination.itemsPerPage, null, this.likesParam)
     .subscribe((res: PaginatedResult<User[]>) => {
         this.users = res.result;
+        this.pagination = res.pagination;
       },
       error => {
         this.alertify.error(error);
       }
     );
-    console.log(this.pagination);
   }
 
   pageChanged(event: any): void {
