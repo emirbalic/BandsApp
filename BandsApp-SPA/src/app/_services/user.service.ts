@@ -74,6 +74,9 @@ export class UserService {
   }
 
   sendLike(id: number, recipientId: number) {
+    // console.log('ok you liked');
+    // console.log('id is now' + recipientId);
+
     return this.http.post(this.baseUrl + 'users/' + id + '/like/' + recipientId, {});
   }
 
@@ -96,7 +99,6 @@ export class UserService {
           if (response.headers.get('Pagination') !== null) {
             paginatedResult.pagination = JSON.parse(response.headers.get('Pagination'));
           }
-          console.log(paginatedResult.result);
           return paginatedResult;
           })
         );
@@ -113,7 +115,7 @@ export class UserService {
     return this.http.post(this.baseUrl + 'users/' + userId + '/messages/' + id, {});
   }
 
-  markAsRead(userId: number, messageId: number){
+  markAsRead(userId: number, messageId: number) {
     this.http.post(this.baseUrl + 'users/' + userId + '/messages/' + messageId + '/read', {})
       .subscribe();
   }

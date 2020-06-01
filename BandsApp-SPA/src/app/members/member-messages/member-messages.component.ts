@@ -4,7 +4,7 @@ import { AuthService } from 'src/app/_services/auth.service';
 import { UserService } from 'src/app/_services/user.service';
 import { AlertifyService } from 'src/app/_services/alertify.service';
 import { tap } from 'rxjs/operators';
-import { currentId } from 'async_hooks';
+// import { currentId } from 'async_hooks';
 
 @Component({
   selector: 'app-member-messages',
@@ -33,8 +33,9 @@ newMessage: any = {};
     this.userService.getMessageThread(this.authService.decodedToken.nameid, this.recipientId)
     .pipe(
       tap( messages => {
-        for (let i = 0; i > messages.length; i++) {
-          if(messages[i].isRead === false && messages[i].recipientId === currentUserId) {
+        // tslint:disable-next-line: prefer-for-of
+        for (let i = 0; i < messages.length; i++) {
+          if (messages[i].isRead === false && messages[i].recipientId === currentUserId) {
             this.userService.markAsRead(currentUserId, messages[i].id);
           }
         }
