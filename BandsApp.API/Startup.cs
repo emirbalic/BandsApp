@@ -32,14 +32,37 @@ namespace BandsApp.API
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        public void ConfigureDevelopmentServices(IServiceCollection services)
+        {
+
+            services.AddDbContext<DataContext>(x =>
+            {
+                x.UseLazyLoadingProxies();
+                x.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            ConfigureServices(services); 
+        }
+        public void ConfigureProductionServices(IServiceCollection services)
+        {
+
+            services.AddDbContext<DataContext>(x =>
+                      {
+                          x.UseLazyLoadingProxies();
+                          x.UseMySql(Configuration.GetConnectionString("DefaultConnection"));
+                      });
+
+            ConfigureServices(services);
+        }
+
+        // This method gets called by the runtime. 
+        // Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(x => x.UseSqlite
-            (Configuration.GetConnectionString("DefaultConnection"))); 
-            services.AddControllers().AddNewtonsoftJson(opt => 
+
+            services.AddControllers().AddNewtonsoftJson(opt =>
             {
-                opt.SerializerSettings.ReferenceLoopHandling = 
+                opt.SerializerSettings.ReferenceLoopHandling =
                 Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
             services.AddCors();
@@ -48,13 +71,14 @@ namespace BandsApp.API
             services.AddScoped<IAuthRepository, AuthRepository>();
             services.AddScoped<IBandsRepository, BandsRepository>();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => {
+                .AddJwtBearer(options =>
+                {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII
                         .GetBytes(Configuration.GetSection("AppSettings:Token").Value)),
-                        ValidateIssuer = false, 
+                        ValidateIssuer = false,
                         ValidateAudience = false
                     };
                 });
@@ -68,15 +92,18 @@ namespace BandsApp.API
             {
                 app.UseDeveloperExceptionPage();
             }
-            else {
+            else
+            {
                 app.UseExceptionHandler(
-                    builder => {
-                        builder.Run(async context => {
+                    builder =>
+                    {
+                        builder.Run(async context =>
+                        {
                             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
                             var error = context.Features.Get<IExceptionHandlerFeature>();
 
-                            if(error != null) 
+                            if (error != null)
                             {
                                 context.Response.AddApplicationError(error.Error.Message);
                                 await context.Response.WriteAsync(error.Error.Message);
@@ -96,9 +123,13 @@ namespace BandsApp.API
 
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapFallbackToController("Index", "Fallback");
             });
         }
     }
